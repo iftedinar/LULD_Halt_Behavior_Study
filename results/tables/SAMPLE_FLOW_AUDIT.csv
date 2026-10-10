@@ -1,0 +1,25 @@
+stage,n,note
+"1. Total collected halt records (raw NASDAQ search, pre-pairing)",27682,"Documented in RESEARCH_LOG.md 2026-09-18; multi-row-per-event artifact of the search UI, not yet deduplicated."
+2. Deduplicated/paired halt events (master event database),11991,luld_master_events.csv
+2a. ...of which confirmed primary LULD pause (LUDP),10320,primary_reason_code == LUDP
+"2b. ...of which other/market-wide, pending confirmation (M)",1671,primary_reason_code == M
+3. Events with >=1 usable pre-halt price bar,9470,pre_halt_bars_available > 0
+4. Events with >=1 usable post-halt price bar (+ SPY match),7501,"post_halt_bars_available > 0; SPY coverage is near-universal (11,709/11,991 dates) so this is the binding constraint. THIS IS THE N=7,501 POPULATION: all post-return and CAR/abnormal-return statistics (Section 3.2 CAR results) are computed on this population, regardless of whether pre-halt data exists."
+5. Events with BOTH pre-halt AND post-halt bars (data_status == 'ok'),7327,"THIS IS THE N=7,327 POPULATION: requires stage 3 AND stage 4 together. Used for any analysis needing pre-halt direction (continuation/reversal classification, magnitude-vs-reversal subgroup)."
+6. Events with neither side usable,2347,"233 delisted/non-tradable symbols plus zero-bar thinly-traded days; excluded from all return-based analysis, counted explicitly."
+7. Valid pre-halt 5-minute return (>=2 bars in the 5-min pre-halt window),7257,Stricter than stage 3: a single pre-halt bar (pre_halt_bars_available==1) cannot form a 5-minute return.
+8. Valid pre-halt direction classification (up/down/flat),7257,= stage 7 (direction is derived from pre_ret_5m sign)
+9. Valid post-halt 1-minute outcome (post_ret_1m),7501,"= stage 4 for every horizon: once a reopening bar exists, every horizon's return is computable (possibly from that single bar alone if trading re-halts almost immediately — see Limitations, bar-boundary caveat)."
+9a. Valid market-adjusted (abnormal) 1-minute return,7501,"= stage 9 intersected with SPY availability (SPY coverage is a superset, so this equals stage 9 exactly)"
+9. Valid post-halt 5-minute outcome (post_ret_5m),7501,"= stage 4 for every horizon: once a reopening bar exists, every horizon's return is computable (possibly from that single bar alone if trading re-halts almost immediately — see Limitations, bar-boundary caveat)."
+9a. Valid market-adjusted (abnormal) 5-minute return,7501,"= stage 9 intersected with SPY availability (SPY coverage is a superset, so this equals stage 9 exactly)"
+9. Valid post-halt 15-minute outcome (post_ret_15m),7501,"= stage 4 for every horizon: once a reopening bar exists, every horizon's return is computable (possibly from that single bar alone if trading re-halts almost immediately — see Limitations, bar-boundary caveat)."
+9a. Valid market-adjusted (abnormal) 15-minute return,7501,"= stage 9 intersected with SPY availability (SPY coverage is a superset, so this equals stage 9 exactly)"
+9. Valid post-halt 30-minute outcome (post_ret_30m),7501,"= stage 4 for every horizon: once a reopening bar exists, every horizon's return is computable (possibly from that single bar alone if trading re-halts almost immediately — see Limitations, bar-boundary caveat)."
+9a. Valid market-adjusted (abnormal) 30-minute return,7501,"= stage 9 intersected with SPY availability (SPY coverage is a superset, so this equals stage 9 exactly)"
+9. Valid post-halt 60-minute outcome (post_ret_60m),7501,"= stage 4 for every horizon: once a reopening bar exists, every horizon's return is computable (possibly from that single bar alone if trading re-halts almost immediately — see Limitations, bar-boundary caveat)."
+9a. Valid market-adjusted (abnormal) 60-minute return,7501,"= stage 9 intersected with SPY availability (SPY coverage is a superset, so this equals stage 9 exactly)"
+"10. Continuation/reversal eligible, 5-minute horizon",5531,Requires stage 8 AND a non-flat post-halt 5m direction
+"11. Continuation/reversal eligible, 30-minute horizon",5878,Requires stage 8 AND a non-flat post-halt 30m direction
+12. Unique symbols,1650,"VERIFIED CORRECT at 1,650 (matches prior reports) after fixing a pandas CSV-parsing pitfall: ticker 'NA' (Nano Labs Ltd) was being silently read as a missing value by pandas' default NA-string list, which would have undercounted to 1,649 in any naive pandas-based read. Cross-checked against a plain csv.DictReader read (immune to this pitfall): 1,650 confirmed independently."
+13. Unique symbol-days (halt_date x symbol),4695,The unit of statistical independence for clustering purposes (Issue 3)
