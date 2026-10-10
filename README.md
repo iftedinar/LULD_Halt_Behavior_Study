@@ -1,4 +1,4 @@
-# Study B — LULD Halt Behavior
+# Study — LULD Halt Behavior
 
 Intraday event study of LULD volatility trading pauses: pre-halt conditions,
 reopening behavior, continuation, reversal, and re-halt probability in U.S. equities.
